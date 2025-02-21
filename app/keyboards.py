@@ -4,15 +4,19 @@ from aiogram.types import (
 	InlineKeyboardMarkup,
 	InlineKeyboardButton)
 
-from aiogram.filters.callback_data import CallbackData
+#from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+#from aiogram.filters.callback_data import CallbackData
 from app.datatime import second_day, third_day, fourth_day, fifth_day
 #first_day, sixth_day, seventh_day 
 
 
-first_kb = ReplyKeyboardMarkup(
-	keyboard=[[KeyboardButton(text='/important')],
-				[KeyboardButton(text='/schedule'),KeyboardButton(text='/price')]], 
-resize_keyboard=True, input_field_placeholder='Выберите пункт в меню', selective=True)
+first_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Важно'), KeyboardButton(text='Регистрация')],
+										[KeyboardButton(text='Расписание'),KeyboardButton(text='Цены')]], 
+resize_keyboard=True, input_field_placeholder='Выберите пункт в меню') #, selective=True)
+
+
+get_number = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text = 'Отправить номер', request_contact=True), KeyboardButton(text='Назад')]], resize_keyboard=True)
+
 
 data_choice = InlineKeyboardMarkup(inline_keyboard=[
 	[
@@ -65,11 +69,15 @@ time_choice = InlineKeyboardMarkup(inline_keyboard=[
 		InlineKeyboardButton(text='20:30', callback_data= 'item22'), 
 		InlineKeyboardButton(text='21:00', callback_data='item23'), 
 		InlineKeyboardButton(text='21:30', callback_data='item24')
-	]
-	])
+	],
+	[
+		InlineKeyboardButton(text='Назад', callback_data= 'step_back')
+	]])
 
 
 
+
+#Пагинация, используется для перебора каких нибудь сисков и тп. Удобно для меню товаров
 # class Pagination(CallbackData, prefix ='pag'):
 # 	action: str
 # 	page: int
@@ -78,6 +86,7 @@ time_choice = InlineKeyboardMarkup(inline_keyboard=[
 # 	builder = InlineKeyboardBuilder()
 # 	builder.row(
 # 		InlineKeyboardButton(text='Назад', callback_data=Pagination(action="prev", page=page).pack()),
-# 		InlineKeyboardButton(text='Вперед', callback_data=Pagination(action="next", page=page).pack())
+# 		InlineKeyboardButton(text='Вперед', callback_data=Pagination(action="next", page=page).pack()),
+# 		width=2
 # 	)
 # 	return builder.as_markup()
