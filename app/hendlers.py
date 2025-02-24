@@ -6,6 +6,8 @@ from aiogram.fsm.context import FSMContext
 
 import app.keyboards as kb
 import app.datatime as dt
+import database as db
+
 
 router = Router()
 
@@ -45,10 +47,19 @@ async def registr_step_tow(message: Message, state: FSMContext):
     await state.update_data(number=message.contact.phone_number)
     data = await state.get_data()
     await message.answer(f'Спасибо за регистрацию! \nИмя: {data['name']}\nФамилия: {data['surname']}\nНомер: {data['number']}\nПожалуйста проверьте верно ли введены данные, в случае ошибки пройдите регистрацию заново')
+    db.DbMarina.db_user_add(client_name=data['name'], client_surname=data['surname'], client_tg_id=message.from_user.id, client_number_phone=data['number'])
     await state.clear()
 
+"""Кнопка изменить данные, которая проводит регистрацию заново"""
+@router.message(F.text =='Изменить данные')
+async def registr_step_one(message: Message, state: FSMContext):
+    db.DbMarina.delete_incorrect_data(old_id=str(message.from_user.id))
+    await state.set_state(Registration.name)
+    await message.answer('Введите Ваше имя')
+
+
 """Кнопка назад которая возвращает первую клавиатуру"""
-@router.message(F.text =='Назад')
+@router.message(F.text =='Выйти')
 async def get_help(message: Message):
     await message.answer(f'Пожалуйста обязательно ознакомтесь с содержимым под кнопкой "Важно" после заходите в расписание', reply_markup=kb.first_kb)
 

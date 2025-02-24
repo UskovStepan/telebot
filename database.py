@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import schedule
 import time
 import app.datatime as day
-
+import logging
 
 
 
@@ -22,130 +22,109 @@ class DbMarina:
 	"""
 	now = day.now
 
-	
+	#Функция для записи регистрирующихся клиентов в Базу данных
 	@staticmethod
 	def db_user_add(client_name, client_surname, client_tg_id, client_number_phone):
 		try:
 			connection = get_connection()
 			with connection.cursor() as cursor:
-				sql ='''INSERT INTO clients(client_name, client_surname, client_tg_id, client_number_phone) VALUES (%s, %s, %s, %s)'''
+				sql = 'INSERT INTO clients(client_name, client_surname, client_tg_id, client_number_phone) VALUES (%s, %s, %s, %s)'
 				cursor.execute(sql, (client_name, client_surname, client_tg_id, client_number_phone))
 				print("Запись выплнена")
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
 
+	
 	#Функция для создания новой таблици для записи клиентов
 	@staticmethod
 	def create_daily_table():
-		today = day.now().strftime("%Y_%m_%d")
-		table_name = day.six_day
-		
+		table_name = day.six_day.strftime("%d_%m")
 		try:
 			connection = get_connection()
-			with connection.cursor as cursor:
-				sql = f'''CREATE TABLE IF NOT EXISTS {table_name} (
-					record_time TIME PRIMARY KEY,
-					client_name VARCHAR(255));'''
-				cursor.execute(sql)
-				connection.commit()
-				print(f'Таблица {table_name} успешно создана')
-
-				start_time = datetime.strptime("10:00", "%H:%M")
-				end_time = datetime.strptime("21:30", "%H:%M")
-				current_time = start_time
-
-			# while current_time <= end_time:
-			# 	insert_query = f"""
-			# 	INSERT INTO {table_name} (record_time, client_name)
-			# 	VALUES (%s, %s)
-			# 	ON CONFLICT (record_time) DO NOTHING;
-			# 	"""
-			# 	cursor.execute(insert_query, (current_time.strftime("%H:%M"), None))
-			# 	current_time += timedelta(minutes=30)
-
-			connection.commit()
-			print(f'Таблица {table_name} успешно заполнена временными интервалами')	
+			with connection.cursor() as cursor:
+				sql1 = f'''CREATE TABLE IF NOT EXISTS tab_{table_name}
+							(
+							recorder_time TIME primary key,
+							record integer,
+							client_id integer							
+							)'''
+				cursor.execute(sql1)
+				logging.info(f'Таблица tab_ успешно создана')
 		except Exception as create_e:
 			print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
 
-	# @staticmethod
-	# def run_sheduler():
-	# 	schedule.every().day.at('14:42').do(create_daliy_table())
-	# 	print('Планировщик запущен. Ожидание времени выполнения задачи...')
-	# 	while True:
-	# 		schedule.run_pending()
-	# 		time.sleep(1)
+	#Метод заполняет таблицу временем. Запись производится с интервалом 30 минут, так же строки record заполняются нулями	
+	@staticmethod
+	def complection_new_table():
+		start_time = datetime.strptime("10:00", "%H:%M")
+		end_time = datetime.strptime("21:30", "%H:%M")
+		current_time = start_time
+		table_name = day.six_day.strftime("%d_%m")
+		num_empty = 0
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				while current_time <= end_time:
+					insert_query = f'INSERT INTO tab_{table_name} (recorder_time, record) VALUES (%s, %s) ON CONFLICT (recorder_time) DO NOTHING;'
+					cursor.execute(insert_query, (current_time.strftime("%H:%M"), num_empty,))
+					current_time += timedelta(minutes=30)
+					logging.info(f'[INFO] запись {current_time} выполнена')
+		except Exception as create_e:
+				print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
+	#При внесении изменений при регистрации строка с ранее внесенными данными полностью удаляется
+	@staticmethod
+	def delete_incorrect_data(old_id):
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql2 = 'DELETE FROM clients WHERE client_tg_id = %s'
+				cursor.execute(sql2, (old_id,))
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при выполнении удаления неверно внесенных данных:', _ex)		
+		
+
+
+
+	#Расписание для создания новой таблици для записи
+	@staticmethod
+	def schedule_table_creation():
+		schedule.every().day.at('14:57').do(DbMarina.create_daily_table)
+		schedule.every().day.at('14:58').do(DbMarina.complection_new_table)
+		print('Планировщик запущен. Ожидание времени выполнения задачи...')
+		while True:
+			schedule.run_pending()
+			time.sleep(1)
+
+
+	#Создание таблици необходимой для регистрации клиентов
+	@staticmethod
+	def clietns():
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql1 = f'''CREATE TABLE IF NOT EXISTS clients
+								(
+								client_id serial,
+								client_name varchar(20),
+								client_surname varchar(20),
+								client_tg_id varchar(50),
+								client_number_phone varchar(20)							
+								)'''
+				cursor.execute(sql1)
+				logging.info(f'Таблица tab_ успешно создана')
+		except Exception as create_e:
+			print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
 #_______________________________________________________________________#
 
-# import psycopg
-# import schedule
-# import time
+#x = DbMarina()
+# x.create_daily_table()
+# x.complection_new_table(
+#t = str(307582652)
+#x.delete_incorrect_data(t)
 
+# Запрос создания таблицы clients
 
-# def get_connection():
-# 	connection = psycopg.connect(
-# 		host = '127.0.0.1',
-# 		user = 'postgres',
-# 		password = 'desam248533',
-# 		dbname='schedule')
-# 	connection.autocommit = True
-# 	return connection
-
-# class DbMarina:
-# 	"""
-# 	Содержит основные функции взаиможействия с БД
-# 	"""
-	
-
-# 	@staticmethod
-# 	def db_user_add(client_name, client_surname, client_tg_id, client_number_phone):
-# 		try:
-# 			connection = get_connection()
-# 			with connection.cursor() as cursor:
-# 				sql ='''INSERT INTO clients(client_name, client_surname, client_tg_id, client_number_phone) VALUES (%s, %s, %s, %s)'''
-# 				cursor.execute(sql, (client_name, client_surname, client_tg_id, client_number_phone))
-# 				print("Запись выплнена")
-# 		except Exception as _ex:
-# 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
-
-
-#         #sql_inser = '''INSERT INTO clients(client_id, client_name, client_surname, client_tg_id, client_number_phone) 
-# 		#SELECT row_number() OVER (ORDER BY client_id) + 1, %s, %s, %s, %s FROM clients'''
-
-
-
-# 	@staticmethod
-# 	def create_daily_table():
-# 		today = day.now().strftime("%Y_%m_%d")
-# 		table_name = day.six_day
-		
-# 		try:
-# 			connection = get_connection()
-# 			with connection.cursor as cursor:
-# 				sql = f'''CREATE TABLE IF NOT EXISTS {table_name} (
-# 					record_time TIME PRIMARY KEY,
-# 					client_name VARCHAR(255));'''
-# 				cursor.execute(sql)
-# 				connection.commit()
-# 				print(f'Таблица {table_name} успешно создана')
-
-# 				start_time = datetime.strptime("10:00", "%H:%M")
-# 				end_time = datetime.strptime("21:30", "%H:%M")
-# 				current_time = start_time
-
-# 			# while current_time <= end_time:
-# 			# 	insert_query = f"""
-# 			# 	INSERT INTO {table_name} (record_time, client_name)
-# 			# 	VALUES (%s, %s)
-# 			# 	ON CONFLICT (record_time) DO NOTHING;
-# 			# 	"""
-# 			# 	cursor.execute(insert_query, (current_time.strftime("%H:%M"), None))
-# 			# 	current_time += timedelta(minutes=30)
-
-# 			connection.commit()
-# 			print(f'Таблица {table_name} успешно заполнена временными интервалами')	
-# 		except Exception as create_e:
-# 			print(f'Ошибка при создании или заполнении таблицы: {create_e}')
+#x.clietns()

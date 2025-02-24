@@ -10,12 +10,12 @@ from app.datatime import second_day, third_day, fourth_day, fifth_day
 #first_day, sixth_day, seventh_day 
 
 
-first_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Важно'), KeyboardButton(text='Регистрация')],
-										[KeyboardButton(text='Расписание'),KeyboardButton(text='Цены')]], 
+first_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Важно'), KeyboardButton(text='Цены')],
+										[KeyboardButton(text='Расписание'),KeyboardButton(text='Регистрация')]], 
 resize_keyboard=True, input_field_placeholder='Выберите пункт в меню') #, selective=True)
 
 
-get_number = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text = 'Отправить номер', request_contact=True), KeyboardButton(text='Назад')]], resize_keyboard=True)
+get_number = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text = 'Отправить номер', request_contact=True), KeyboardButton(text='Изменить данные')], [KeyboardButton(text='Выйти')] ], resize_keyboard=True)
 
 
 data_choice = InlineKeyboardMarkup(inline_keyboard=[
