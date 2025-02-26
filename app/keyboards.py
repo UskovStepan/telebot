@@ -26,6 +26,9 @@ data_choice = InlineKeyboardMarkup(inline_keyboard=[
 	[
 		InlineKeyboardButton(text=f'{fourth_day.strftime("%d %b")}', callback_data='button3'), 
 		InlineKeyboardButton(text=f'{fifth_day.strftime("%d %b")}', callback_data='button4')
+	],
+	[
+		InlineKeyboardButton(text='Назад', callback_data='button5')
 	]
 	])
 	
@@ -76,6 +79,22 @@ time_choice = InlineKeyboardMarkup(inline_keyboard=[
 
 
 
+selecting_a_procedure = InlineKeyboardMarkup(inline_keyboard=[
+	[InlineKeyboardButton(text='Мужская стрижка', callback_data='M1')],
+	[InlineKeyboardButton(text='Мужская+детокс кожи головы', callback_data='M2')],
+	[InlineKeyboardButton(text='Тонирование седены+Мужская стрижка', callback_data='M3')],
+	[InlineKeyboardButton(text='Челка', callback_data='W1')],
+	[InlineKeyboardButton(text='Ровный срез с мытьем головы', callback_data='W2')],
+	[InlineKeyboardButton(text='Ровный срез без мытьем головы', callback_data='W3')],
+	[InlineKeyboardButton(text='Мытье головы+выпрямление', callback_data='W4')],
+	[InlineKeyboardButton(text='Уход "Рекавери"+Стрижка', callback_data='W5')],
+	[InlineKeyboardButton(text='Уход "Детокс"+Стрижка', callback_data='W6')],
+	[InlineKeyboardButton(text='Уход "Пломбир"+Стрижка', callback_data='W7')],
+	[InlineKeyboardButton(text='Рекавери+Детокс+Стрижка', callback_data='W8')],
+	[InlineKeyboardButton(text='Пломбир+Детокс+Стрижка', callback_data='W9')],
+	[InlineKeyboardButton(text='Корни+Тонирование+Стрижка', callback_data='W10')],
+	[InlineKeyboardButton(text='Корни+Длина(Пермамент)+Стрижка', callback_data='W11')]
+])
 
 #Пагинация, используется для перебора каких нибудь сисков и тп. Удобно для меню товаров
 # class Pagination(CallbackData, prefix ='pag'):
