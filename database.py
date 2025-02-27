@@ -2,7 +2,7 @@ import psycopg
 from datetime import datetime, timedelta
 import schedule
 import time
-import app.datatime as day
+import app.dateandtimes as day
 import logging
 
 
@@ -46,7 +46,8 @@ class DbMarina:
 							(
 							recorder_time TIME primary key,
 							record integer,
-							client_id integer							
+							client_id integer
+							procedure varchar(120)							
 							)'''
 				cursor.execute(sql1)
 				logging.info(f'Таблица tab_ успешно создана')
@@ -121,13 +122,13 @@ class DbMarina:
 
 		#Функция для записи клиентов на определенное время
 	@staticmethod
-	def db_schedule_add(client_id, date, recorder_time, record):
+	def db_schedule_add(client_id, date, recorder_time, record, procedure):
 		table_name = date.strftime("%d_%m")
 		try:
 			connection = get_connection() #Добавить в таблицу процедуру
 			with connection.cursor() as cursor:
-				sql = f'INSERT INTO tab_{table_name} WHERE recorder_time = {recorder_time} (record, id_client) VALUES (%s, %s) ON CONFLICT (recorder_time) DO NOTHING;'
-				cursor.execute(sql, (recorder_time, record, client_id))
+				sql = f'INSERT INTO tab_{table_name} WHERE recorder_time = {recorder_time} (record, id_client, procedure) VALUES (%s, %s, %s) ON CONFLICT (recorder_time) DO NOTHING;'
+				cursor.execute(sql, (recorder_time, record, client_id, procedure))
 				print("Запись выплнена")
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)

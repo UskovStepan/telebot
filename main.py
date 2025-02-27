@@ -1,13 +1,13 @@
 import asyncio
 import logging
-import database as db
+# import database as db
 
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 from app.hendlers import router
-from datetime import datetime, timedelta
-import schedule
-import time
+
+# import schedule
+# import time
 
 
 

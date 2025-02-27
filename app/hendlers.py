@@ -3,14 +3,12 @@ from aiogram.filters import CommandStart,  StateFilter, Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from datetime import datetime, timedelta
 
-from app.datatime import second_day, third_day, fourth_day, fifth_day
 
 import app.keyboards as kb
-import app.datatime as dt
+import app.slovo as sl
 import database as db
-import app.slovo as slovo
+
 
 router = Router()
 
@@ -95,36 +93,32 @@ async def schedule(message: Message, state: FSMContext):
     await message.answer(f'{message.from_user.first_name} выбурите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
     await state.set_state(Registration_data.procedure)
 
+
 @router.callback_query(Registration_data.procedure)
 async def procedure_selection(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(procedure = callback.data)
+    await state.update_data(procedure = str(callback.data))
     await callback.message.edit_text(f'Выберите день записи:', reply_markup=kb.data_choice)
     await state.set_state(Registration_data.date)
 
-"""Записаться можно на 4 будующих дня, поэтому в меню Schedule 4 кнопки выбора дня и одна кнопка назад возвращающая пользователя к выбору дня"""
 
+"""Записаться можно на 4 будующих дня, поэтому в меню Schedule 4 кнопки выбора дня и одна кнопка назад возвращающая пользователя к выбору дня"""
 @router.callback_query(Registration_data.date)
 async def procedure_selection(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(date = callback.data)
+    await state.update_data(date = str(callback.data))
     await callback.message.edit_text(f'Время для записи', reply_markup=kb.time_choice)
     await state.set_state(Registration_data.time)
-
-
 
 
 """Регистрация данных о записи в базу данных и очистка state"""
 @router.callback_query(Registration_data.time)
 async def procedure_selection_steptow(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(time = callback.data)
+    await state.update_data(time = str(callback.data))
     data = await state.get_data()
-    await callback.message.edit_text(f'Спасибо! Вы записанны на:\nДата: {data['date']}\nВремя: {slovo.time_name[data['time']]}\nНа: {slovo.procedure_name[data['procedure']]}\nВам прийдет напоминание в день посещения и за час до начала.')
-    db.DbMarina.db_schedule_add(client_id = callback.message.from_user.id, date = slovo.data_name[data['date']], time = slovo.time_name[data['time']], procedure = slovo.procedure_name[data['procedure']])
-    print(response = (f'''Дата: {data["date"]}\n
-                        Время: {data["time"]}\n
-                        Процедура: {data["procedure"]}\n'''))
+    await callback.message.edit_text(f'''Спасибо! Вы записанны на:\nДата: {sl.data_name[str(data["date"])]}\nВремя: {sl.time_name[str(data['time'])]}\nНа процедуру: {sl.procedure_name[str(data['procedure'])]}\nВам прийдет напоминание в день посещения и за час до начала.''')
+    db.DbMarina.db_schedule_add(client_id = callback.message.from_user.id, date = sl.data_name[data['date']], recorder_time = sl.time_name[data['time']], procedure = sl.procedure_name[data['procedure']])
+    print(f'''Дата: {sl.data_name[str(data["date"])]}\nВремя: {sl.time_name[str(data['time'])]}\nПроцедура: {sl.procedure_name[str(data['procedure'])]}''')
     await state.clear()
    
-
 
 @router.callback_query(F.data == 'button5')
 async def catalog_day_four(callback:CallbackQuery): 

@@ -1,13 +1,13 @@
-import psycopg
-from datetime import datetime, timedelta
-import schedule
-import time
-import app.datatime as day
-from app.datatime import second_day, third_day, fourth_day, fifth_day
+#from datetime import datetime, timedelta
+import app.dateandtimes as date
+# from datetime import datetime, timedelta
 
-
-
-
+# now = datetime.now()
+# second_day = now + timedelta(days=1)
+# third_day = now + timedelta(days=2)
+# fourth_day = now + timedelta(days=3)
+# fifth_day = now + timedelta(days=4)
+# six_day = now + timedelta(days=5)
 
 procedure_name = {'M1': 'Мужская стрижка',
 			'M2': 'Мужская+детокс кожи головы',
@@ -25,25 +25,31 @@ procedure_name = {'M1': 'Мужская стрижка',
 			'W11': 'Корни+Длина(Пермамент)+Стрижка'}
     
 data_name = {
-    'button1': f'{second_day.strftime("%d %b")}',
-	'button2': f'{third_day.strftime("%d %b")}',
-	'button3': f'{fourth_day.strftime("%d %b")}',
-	'button4': f'{fifth_day.strftime("%d %b")}'}
+    'button1': f'{date.second_day.strftime("%d %b")}',
+	'button2': f'{date.third_day.strftime("%d %b")}',
+	'button3': f'{date.fourth_day.strftime("%d %b")}',
+	'button4': f'{date.fifth_day.strftime("%d %b")}'}
 
+time_name = {'item1': '10:00', 'item2': '10:30', 'item3': '11:00', 'item4': '11:30', 'item5': '12:00', 'item6': '12:30', 
+'item7': '13:00', 'item8': '13:30', 'item9': '14:00', 'item10': '14:30', 'item11': '15:00', 'item12': '15:30', 'item13': '16:00', 'item14': '16:30', 'item15': '17:00', 'item16': '17:30', 'item17': '18:00', 'item18': '18:30', 'item19': '19:00', 'item20': '19:30', 'item21': '20:00', 'item22': '20:30', 'item23': '21:00', 'item24': '21:30'}
 
-def lol(current_time, end_time):
-	total = 1
-	result = {}
-	current_time = start_time
-	while current_time <= end_time:
-		result[f"item{total}"] = current_time.strftime("%H:%M")
-		total += 1
-		current_time += timedelta(minutes=30)
-	return result
+# def lol(current_time, end_time):
+# 	total = 1
+# 	result = {}
+# 	current_time = start_time
+# 	while current_time <= end_time:
+# 		result[f"item{total}"] = current_time.strftime("%H:%M")
+# 		total += 1
+# 		current_time += timedelta(minutes=30)
+# 	return result
 
-start_time = datetime.strptime("10:00", "%H:%M")
-end_time = datetime.strptime("21:30", "%H:%M")
-current_time = start_time
+# start_time = datetime.strptime("10:00", "%H:%M")
+# end_time = datetime.strptime("21:30", "%H:%M")
+# current_time = start_time
 
-result_dict = lol(start_time, end_time)
-time_name = result_dict
+# result_dict = lol(start_time, end_time)
+# time_name = result_dict
+
+# print(type(data_name['button2']))
+# print(type(time_name['item1']))
+# print(type(procedure_name['M3']))

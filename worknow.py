@@ -126,3 +126,4 @@ current_time = start_time
 
 result_dict = lol(start_time, end_time)
 print(result_dict)
+print(day.fifth_day.strftime("%d %b"))

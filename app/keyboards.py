@@ -6,7 +6,7 @@ from aiogram.types import (
 
 #from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 #from aiogram.filters.callback_data import CallbackData
-from app.datatime import second_day, third_day, fourth_day, fifth_day
+import app.dateandtimes as date
 #first_day, sixth_day, seventh_day 
 
 
@@ -20,12 +20,12 @@ get_number = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text = 'Отправ�
 
 data_choice = InlineKeyboardMarkup(inline_keyboard=[
 	[
-		InlineKeyboardButton(text=f'{second_day.strftime("%d %b")}', callback_data='button1'), 
-		InlineKeyboardButton(text=f'{third_day.strftime("%d %b")}', callback_data='button2')
+		InlineKeyboardButton(text=f'{date.second_day.strftime("%d %b")}', callback_data='button1'), 
+		InlineKeyboardButton(text=f'{date.third_day.strftime("%d %b")}', callback_data='button2')
 	], 		
 	[
-		InlineKeyboardButton(text=f'{fourth_day.strftime("%d %b")}', callback_data='button3'), 
-		InlineKeyboardButton(text=f'{fifth_day.strftime("%d %b")}', callback_data='button4')
+		InlineKeyboardButton(text=f'{date.fourth_day.strftime("%d %b")}', callback_data='button3'), 
+		InlineKeyboardButton(text=f'{date.fifth_day.strftime("%d %b")}', callback_data='button4')
 	],
 	[
 		InlineKeyboardButton(text='Назад', callback_data='button5')
