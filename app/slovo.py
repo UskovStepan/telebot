@@ -2,12 +2,7 @@
 import app.dateandtimes as date
 # from datetime import datetime, timedelta
 
-# now = datetime.now()
-# second_day = now + timedelta(days=1)
-# third_day = now + timedelta(days=2)
-# fourth_day = now + timedelta(days=3)
-# fifth_day = now + timedelta(days=4)
-# six_day = now + timedelta(days=5)
+
 
 procedure_name = {'M1': 'Мужская стрижка',
 			'M2': 'Мужская+детокс кожи головы',
@@ -25,14 +20,19 @@ procedure_name = {'M1': 'Мужская стрижка',
 			'W11': 'Корни+Длина(Пермамент)+Стрижка'}
     
 data_name = {
-    'button1': f'{date.second_day.strftime("%d %b")}',
-	'button2': f'{date.third_day.strftime("%d %b")}',
-	'button3': f'{date.fourth_day.strftime("%d %b")}',
-	'button4': f'{date.fifth_day.strftime("%d %b")}'}
+    'button1': f'{date.second_day.strftime("%d_%m")}',
+	'button2': f'{date.third_day.strftime("%d_%m")}',
+	'button3': f'{date.fourth_day.strftime("%d_%m")}',
+	'button4': f'{date.fifth_day.strftime("%d_%m")}'}
 
 time_name = {'item1': '10:00', 'item2': '10:30', 'item3': '11:00', 'item4': '11:30', 'item5': '12:00', 'item6': '12:30', 
 'item7': '13:00', 'item8': '13:30', 'item9': '14:00', 'item10': '14:30', 'item11': '15:00', 'item12': '15:30', 'item13': '16:00', 'item14': '16:30', 'item15': '17:00', 'item16': '17:30', 'item17': '18:00', 'item18': '18:30', 'item19': '19:00', 'item20': '19:30', 'item21': '20:00', 'item22': '20:30', 'item23': '21:00', 'item24': '21:30'}
 
+list_procedure_time_30min = ['Челка', 'Ровный срез с мытьем головы']
+list_procedure_time_60min = ['Мужская стрижка', 'Ровный срез без мытьем головы', 'Мытье головы+выпрямление']
+list_procedure_time_90min = ['Мужская+детокс кожи головы', 'Тонирование седены+Мужская стрижка', 'Test']
+list_procedure_time_120min = ['Уход "Рекавери"+Стрижка', 'Уход "Детокс"+Стрижка', 'Уход "Пломбир"+Стрижка',	'Рекавери+Детокс+Стрижка', 'Пломбир+Детокс+Стрижка', 'Корни+Тонирование+Стрижка', 'Корни+Длина(Пермамент)+Стрижка']
+			
 # def lol(current_time, end_time):
 # 	total = 1
 # 	result = {}

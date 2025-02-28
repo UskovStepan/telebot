@@ -4,6 +4,7 @@ import schedule
 import time
 import app.dateandtimes as day
 import logging
+import app.slovo as sl
 
 
 
@@ -46,7 +47,7 @@ class DbMarina:
 							(
 							recorder_time TIME primary key,
 							record integer,
-							client_id integer
+							client_id varchar(30),
 							procedure varchar(120)							
 							)'''
 				cursor.execute(sql1)
@@ -61,7 +62,7 @@ class DbMarina:
 		start_time = datetime.strptime("10:00", "%H:%M")
 		end_time = datetime.strptime("21:30", "%H:%M")
 		current_time = start_time
-		table_name = day.six_day.strftime("%d_%m")
+		table_name = day.fifth_day.strftime("%d_%m")
 		num_empty = 0
 		try:
 			connection = get_connection()
@@ -122,21 +123,47 @@ class DbMarina:
 
 		#Функция для записи клиентов на определенное время
 	@staticmethod
-	def db_schedule_add(client_id, date, recorder_time, record, procedure):
-		table_name = date.strftime("%d_%m")
+	def db_schedule_add(recorder_time, procedure, client_id, date, record = 1):
+		table_name = date
 		try:
 			connection = get_connection() #Добавить в таблицу процедуру
 			with connection.cursor() as cursor:
-				sql = f'INSERT INTO tab_{table_name} WHERE recorder_time = {recorder_time} (record, id_client, procedure) VALUES (%s, %s, %s) ON CONFLICT (recorder_time) DO NOTHING;'
-				cursor.execute(sql, (recorder_time, record, client_id, procedure))
-				print("Запись выплнена")
+				if procedure in sl.list_procedure_time_30min:
+					sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
+					cursor.execute(sql, (record, client_id, procedure, recorder_time))
+				elif procedure in sl.list_procedure_time_60min:
+					for _ in range(2):
+						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
+						cursor.execute(sql, (record, client_id, procedure, recorder_time))
+						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
+						print(db_time)
+						recorder_time = str(db_time)
+						print(recorder_time)
+				elif procedure in sl.list_procedure_time_90min:
+					for _ in range(3):
+						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
+						cursor.execute(sql, (record, client_id, procedure, recorder_time))
+						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
+						print(db_time)
+						recorder_time = str(db_time.strftime("%H:%M"))
+						print(recorder_time)
+				else:
+					for _ in range(4):
+						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
+						cursor.execute(sql, (record, client_id, procedure, recorder_time))
+						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
+						print(db_time)
+						recorder_time = str(db_time.strftime("%H:%M"))
+						print(recorder_time)
+
+				print("Запись выполнена")
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
 #_______________________________________________________________________#
 
-# x = DbMarina()
-# x.create_daily_table()
-# x.complection_new_table()
+#x = DbMarina()
+#x.create_daily_table()
+#x.complection_new_table()
 #t = str(307582652)
 #x.delete_incorrect_data(t)
 
