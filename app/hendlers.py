@@ -90,6 +90,9 @@ class Registration_data(StatesGroup):
 
 @router.message(F.text == 'Расписание')
 async def schedule(message: Message, state: FSMContext):
+    id = message.from_user.id
+    if db.DbMarina.search_for_an_existing(id) is not None:
+        await message.answer(f'Вы записаны на: {db.DbMarina.search_for_an_existing(id)[0]}\nВремя записи: {db.DbMarina.search_for_an_existing(id)[1]}\nНа процедуру: {db.DbMarina.search_for_an_existing(id)[2]}')
     await message.answer(f'{message.from_user.first_name} выбурите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
     await state.set_state(Registration_data.procedure)
 
@@ -105,7 +108,9 @@ async def procedure_selection(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(Registration_data.date)
 async def procedure_selection(callback: CallbackQuery, state: FSMContext):
     await state.update_data(date = str(callback.data))
-    await callback.message.edit_text(f'Время для записи', reply_markup=kb.time_choice)
+    free_time_chooise= db.DbMarina.screan_schedule(sl.data_name[callback.data])
+    free_time_chooise_keyboards = kb.create_time_keyboard(free_time_chooise)
+    await callback.message.edit_text(f'Время для записи', reply_markup=free_time_chooise_keyboards)
     await state.set_state(Registration_data.time)
 
 

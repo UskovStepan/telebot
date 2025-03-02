@@ -1,20 +1,20 @@
-import psycopg
-from datetime import datetime, timedelta
-import schedule
-import time
-import app.dateandtimes as day
-import logging
-import app.slovo as sl
+# import psycopg
+# from datetime import datetime, timedelta
+# import schedule
+# import time
+# import app.dateandtimes as day
+# import logging
+# import app.slovo as sl
 
 
-def get_connection():
-	connection = psycopg.connect(
-		host = '127.0.0.1',
-		user = 'postgres',
-		password = 'desam248533',
-		dbname='schedule')
-	connection.autocommit = True
-	return connection
+# def get_connection():
+# 	connection = psycopg.connect(
+# 		host = '127.0.0.1',
+# 		user = 'postgres',
+# 		password = 'desam248533',
+# 		dbname='schedule')
+# 	connection.autocommit = True
+# 	return connection
 
 
 
@@ -65,5 +65,34 @@ def get_connection():
 # 				print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
 # x = DbMarina()
-# #x.create_daily_table()
+# x.create_daily_table()
 # x.complection_new_table()
+
+
+# 	@staticmethod
+# 	def screan_schedule(date):
+# 		start_time = datetime.strptime("10:00", "%H:%M")
+# 		end_time = datetime.strptime("21:30", "%H:%M")
+# 		current_time = start_time
+# 		table_name = date
+# 		free_time = dict()
+# 		try:
+# 			connection = get_connection()
+# 			with connection.cursor() as cursor:
+# 				while current_time <= end_time:	
+# 					sql = f'select record from tab_{table_name} where recorder_time = %s'
+# 					cursor.execute(sql, (current_time.time(),))
+# 					row = cursor.fetchone()
+# 					print(current_time.time(), type(row))
+# 					if row == (1,):
+# 						free_time[str(current_time.time())] = 1
+# 					else:
+# 						free_time[str(current_time.time())] = 0
+# 					current_time += timedelta(minutes=30)
+# 			return free_time
+# 		except Exception as _ex:
+# 			print(f'[INFO] :', _ex)
+		
+
+# x = DbMarina()
+# resutl = x.screan_schedule('03_03')

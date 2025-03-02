@@ -3,6 +3,8 @@ from aiogram.types import (
 	KeyboardButton,
 	InlineKeyboardMarkup,
 	InlineKeyboardButton)
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+import worknow as wr
 
 #from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 #from aiogram.filters.callback_data import CallbackData
@@ -31,6 +33,17 @@ data_choice = InlineKeyboardMarkup(inline_keyboard=[
 		InlineKeyboardButton(text='Назад', callback_data='button5')
 	]
 	])
+
+def create_time_keyboard(free_time):
+	builder = InlineKeyboardBuilder()
+	item = 0
+	for time, is_broked in free_time.items():
+		item += 1
+		if not is_broked:
+			builder.add(InlineKeyboardButton(text=time, callback_data= f'item{item}'))
+	builder.adjust(3)
+	return builder.as_markup()
+
 	
 time_choice = InlineKeyboardMarkup(inline_keyboard=[
 	[
@@ -76,7 +89,6 @@ time_choice = InlineKeyboardMarkup(inline_keyboard=[
 	[
 		InlineKeyboardButton(text='Назад', callback_data= 'step_back')
 	]])
-
 
 
 selecting_a_procedure = InlineKeyboardMarkup(inline_keyboard=[
