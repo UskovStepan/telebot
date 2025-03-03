@@ -18,7 +18,8 @@ marina = '@Smarnie'
 """Обработчик команды старт"""
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-	await message.answer(f'Привет {message.from_user.first_name} {message.from_user.last_name}! Я помогу тебе записаться к {marina}, расскажу тебе о ценах на услуги и напомню о записи за час! Пожалуйста не забудьте пройти регистрацию!', reply_markup=kb.first_kb)
+    surname = message.from_user.last_name if message.from_user.last_name else ' '
+    await message.answer(f'Привет {message.from_user.first_name} {surname}! Я помогу тебе записаться к {marina}, расскажу тебе о ценах на услуги и напомню о записи за час! Пожалуйста не забудьте пройти регистрацию!', reply_markup=kb.first_kb)
      
 """Обработка регистрации ползователя"""
 class Registration(StatesGroup):
@@ -29,8 +30,13 @@ class Registration(StatesGroup):
    
 @router.message(F.text == 'Регистрация')
 async def registr_step_one(message: Message, state: FSMContext):
-    await state.set_state(Registration.name)
-    await message.answer('Введите Ваше имя')
+    id = message.from_user.id
+    result = db.DbMarina.check_user_bd(id)
+    if result is not None:
+        await message.answer(f'Вы уже зарегистрированны!\nИмя: {result["name"]}\n Фамилия: {result["surname"]}\nНомер телефона: {result["number_phone"]}\nЕсли хотите внести изменения нажмите кнопку "ИЗМЕНИТЬ ДАННЫЕ"', reply_markup=kb.get_number)
+    else:
+        await state.set_state(Registration.name)
+        await message.answer('Введите Ваше имя')
 
 @router.message(Registration.name)
 async def registr_step_tow(message: Message, state: FSMContext):
@@ -91,10 +97,12 @@ class Registration_data(StatesGroup):
 @router.message(F.text == 'Расписание')
 async def schedule(message: Message, state: FSMContext):
     id = message.from_user.id
-    if db.DbMarina.search_for_an_existing(id) is not None:
-        await message.answer(f'Вы записаны на: {db.DbMarina.search_for_an_existing(id)[0]}\nВремя записи: {db.DbMarina.search_for_an_existing(id)[1]}\nНа процедуру: {db.DbMarina.search_for_an_existing(id)[2]}')
-    await message.answer(f'{message.from_user.first_name} выбурите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
-    await state.set_state(Registration_data.procedure)
+    result = db.DbMarina.search_for_an_existing(id)
+    if result is not None:
+        await message.answer(f'Вы записаны на: {result["date_rec"]}\nВремя записи: {result["recorder_time"]}\nНа процедуру: {result["procedure"]}')
+    else:
+        await message.answer(f'ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ ЗАПИСЬ ОБЯЗАТЕЛЬНО ПЕРЕЗАГРУЖАЙТЕ БОТА ДЛЯ АКТУАЛИЗАЦИИ ИНФОРМАЦИИ!!!\n{message.from_user.first_name} выбурите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
+        await state.set_state(Registration_data.procedure)
 
 
 @router.callback_query(Registration_data.procedure)
@@ -107,7 +115,8 @@ async def procedure_selection(callback: CallbackQuery, state: FSMContext):
 """Записаться можно на 4 будующих дня, поэтому в меню Schedule 4 кнопки выбора дня и одна кнопка назад возвращающая пользователя к выбору дня"""
 @router.callback_query(Registration_data.date)
 async def procedure_selection(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(date = str(callback.data))
+    await state.update_data(date = callback.data)
+    #print(Registration_data.date)
     free_time_chooise= db.DbMarina.screan_schedule(sl.data_name[callback.data])
     free_time_chooise_keyboards = kb.create_time_keyboard(free_time_chooise)
     await callback.message.edit_text(f'Время для записи', reply_markup=free_time_chooise_keyboards)
@@ -120,7 +129,7 @@ async def procedure_selection_steptow(callback: CallbackQuery, state: FSMContext
     await state.update_data(time = str(callback.data))
     data = await state.get_data()
     await callback.message.edit_text(f'''Спасибо! Вы записанны на:\nДата: {sl.data_name[str(data["date"])]}\nВремя: {sl.time_name[str(data['time'])]}\nНа процедуру: {sl.procedure_name[str(data['procedure'])]}\nВам прийдет напоминание в день посещения и за час до начала.''')
-    db.DbMarina.db_schedule_add(client_id = callback.message.from_user.id, date = sl.data_name[data['date']], recorder_time = sl.time_name[data['time']], procedure = sl.procedure_name[data['procedure']])
+    db.DbMarina.db_schedule_add(client_id = callback.from_user.id, date = sl.data_name[data['date']], recorder_time = sl.time_name[data['time']], procedure = sl.procedure_name[data['procedure']])
     print(f'''Дата: {sl.data_name[str(data["date"])]}\nВремя: {sl.time_name[str(data['time'])]}\nПроцедура: {sl.procedure_name[str(data['procedure'])]}''')
     await state.clear()
    

@@ -34,7 +34,29 @@ class DbMarina:
 				print("Запись выплнена")
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
-
+	
+	
+	#Функция проверки регистрации
+	@staticmethod
+	def check_user_bd(client_id):
+		result = dict()
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql = 'SELECT * from clients where client_tg_id = %s'
+				cursor.execute(sql, (str(client_id),))
+				res = cursor.fetchall()
+				if len(res)>0:
+					result['id'] = res[0][0]
+					result['name'] = res[0][1]
+					result['surname'] = res[0][2]
+					result['tg_id'] = res[0][3]
+					result['number_phone'] = res[0][4]
+			if result == {}:
+				result = None
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
+		return result
 	
 	#Функция для создания новой таблици для записи клиентов
 	@staticmethod
@@ -62,7 +84,7 @@ class DbMarina:
 		start_time = datetime.strptime("10:00", "%H:%M")
 		end_time = datetime.strptime("21:30", "%H:%M")
 		current_time = start_time
-		table_name = day.fifth_day.strftime("%d_%m")
+		table_name = day.six_day.strftime("%d_%m")
 		num_empty = 0
 		try:
 			connection = get_connection()
@@ -161,7 +183,6 @@ class DbMarina:
 
 
 	#Возвращает список для заполнения актуальной клавиатуры отображающей свободное время
-
 	@staticmethod
 	def screan_schedule(date):
 		start_time = datetime.strptime("10:00", "%H:%M")
@@ -184,41 +205,52 @@ class DbMarina:
 			return free_time
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
-		
+
+	#Функция проверяет существует ли запись в БД		
 	@staticmethod
 	def search_for_an_existing(client_id):
 		#client_id = str(client_id)
-		#print(type(client_id))
+		print(client_id)
 		try:
 			connection = get_connection()
 			with connection.cursor() as cursor:
-				table_name = day.second_day.strftime("%d_%m")
-				for _ in range(6):
-					sql = f'select recorder_time from tab_{table_name} where client_id = %s'
-					cursor.execute(sql, (client_id,))
+				current_data = day.now
+				res = dict()
+				for _ in range(5):
+					table_name = current_data.strftime('%d_%m')
+					sql = f'select recorder_time, procedure from tab_{table_name} where client_id = %s'
+					cursor.execute(sql, (str(client_id),))
 					result = cursor.fetchall()
-					formatted_result = [(time.strftime('%H:%M')) for (time,) in result]
-
-					sql1 = f'select procedure from tab_{table_name} where client_id = %s'
-					cursor.execute(sql1, (client_id,))
-					formatted_result1 = cursor.fetchall()
-					result1 = [i[0] for i in formatted_result1]
-
-					res = [day.second_day.strftime("%d_%m"), formatted_result[0], result1[0]]
+					if len(result)>0:
+						res['date_rec'] = table_name
+						res['recorder_time'] = result[0][0].strftime('%H:%M')  
+						res['procedure'] = result[0][1]
+						break
+					else:
+						current_data += timedelta(days=1)
+			if res == {}:
+				res = None		
+					#res = [day.now.strftime("%d_%m"), formatted_result[0], result1[0]]
 					#if cursor.fetchone() is not 'Null':
 			return res
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
+			return None
 #_______________________________________________________________________#
+	
 
-#x = DbMarina()
+
+
+
+x = DbMarina()
 #x.create_daily_table()
 #x.complection_new_table()
 #t = str(307582652)
 #x.delete_incorrect_data(t)
-#print(x.screan_schedule('03_03'))
+#print(x.screan_schedule('04_03'))
 #x = DbMarina()
-#print(x.search_for_an_existing(7901916608))
+#print(x.search_for_an_existing('870857305'))
+print(x.check_user_bd('30758265'))
 
 
 # Запрос создания таблицы clients
