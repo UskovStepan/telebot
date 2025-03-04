@@ -98,11 +98,14 @@ class Registration_data(StatesGroup):
 async def schedule(message: Message, state: FSMContext):
     id = message.from_user.id
     result = db.DbMarina.search_for_an_existing(id)
-    if result is not None:
-        await message.answer(f'Вы записаны на: {result["date_rec"]}\nВремя записи: {result["recorder_time"]}\nНа процедуру: {result["procedure"]}')
+    if db.DbMarina.search_registr(id) == False:
+        await message.answer(f'Вы забыли зарегистрироваться, запись доступка только после регистрации')
     else:
-        await message.answer(f'ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ ЗАПИСЬ ОБЯЗАТЕЛЬНО ПЕРЕЗАГРУЖАЙТЕ БОТА ДЛЯ АКТУАЛИЗАЦИИ ИНФОРМАЦИИ!!!\n{message.from_user.first_name} выбурите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
-        await state.set_state(Registration_data.procedure)
+        if result is not None:
+            await message.answer(f'Вы записаны на: {result["date_rec"]}\nВремя записи: {result["recorder_time"]}\nНа процедуру: {result["procedure"]}')
+        else:
+            await message.answer(f'ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ ЗАПИСЬ ОБЯЗАТЕЛЬНО ПЕРЕЗАГРУЖАЙТЕ БОТА ДЛЯ АКТУАЛИЗАЦИИ ИНФОРМАЦИИ!!!\n{message.from_user.first_name}, выберите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
+            await state.set_state(Registration_data.procedure)
 
 
 @router.callback_query(Registration_data.procedure)
@@ -116,8 +119,8 @@ async def procedure_selection(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(Registration_data.date)
 async def procedure_selection(callback: CallbackQuery, state: FSMContext):
     await state.update_data(date = callback.data)
-    #print(Registration_data.date)
-    free_time_chooise= db.DbMarina.screan_schedule(sl.data_name[callback.data])
+    kr = await state.get_data()
+    free_time_chooise= db.DbMarina.check_available_slots(procedure=sl.procedure_name[kr['procedure']], date= sl.data_name[kr['date']])
     free_time_chooise_keyboards = kb.create_time_keyboard(free_time_chooise)
     await callback.message.edit_text(f'Время для записи', reply_markup=free_time_chooise_keyboards)
     await state.set_state(Registration_data.time)

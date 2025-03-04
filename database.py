@@ -61,7 +61,7 @@ class DbMarina:
 	#Функция для создания новой таблици для записи клиентов
 	@staticmethod
 	def create_daily_table():
-		table_name = day.six_day.strftime("%d_%m")
+		table_name = day.now.strftime("%d_%m")
 		try:
 			connection = get_connection()
 			with connection.cursor() as cursor:
@@ -84,7 +84,7 @@ class DbMarina:
 		start_time = datetime.strptime("10:00", "%H:%M")
 		end_time = datetime.strptime("21:30", "%H:%M")
 		current_time = start_time
-		table_name = day.six_day.strftime("%d_%m")
+		table_name = day.now.strftime("%d_%m")
 		num_empty = 0
 		try:
 			connection = get_connection()
@@ -96,6 +96,7 @@ class DbMarina:
 					logging.info(f'[INFO] запись {current_time} выполнена')
 		except Exception as create_e:
 				print(f'Ошибка при создании или заполнении таблицы: {create_e}')
+
 
 	#При внесении изменений при регистрации строка с ранее внесенными данными полностью удаляется
 	@staticmethod
@@ -144,7 +145,7 @@ class DbMarina:
 	#Функция для записи клиентов на определенное время
 	@staticmethod
 	def db_schedule_add(recorder_time, procedure, client_id, date, record = 1):
-		print(recorder_time, type(recorder_time))
+		
 		table_name = date
 		try:
 			connection = get_connection()
@@ -157,25 +158,19 @@ class DbMarina:
 						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
 						cursor.execute(sql, (record, client_id, procedure, recorder_time))
 						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
-						print(db_time)
 						recorder_time = str(db_time)
-						print(recorder_time)
 				elif procedure in sl.list_procedure_time_90min:
 					for _ in range(3):
 						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
 						cursor.execute(sql, (record, client_id, procedure, recorder_time))
 						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
-						print(db_time)
-						recorder_time = str(db_time.strftime("%H:%M"))
-						print(recorder_time)
+						recorder_time = str(db_time.strftime("%H:%M"))	
 				else:
 					for _ in range(4):
 						sql = f'UPDATE tab_{table_name} SET record = %s, client_id = %s, procedure = %s WHERE recorder_time = %s;'
 						cursor.execute(sql, (record, client_id, procedure, recorder_time))
 						db_time = datetime.strptime(recorder_time, "%H:%M")+timedelta(minutes=30)
-						print(db_time)
 						recorder_time = str(db_time.strftime("%H:%M"))
-						print(recorder_time)
 
 				print("Запись выполнена")
 		except Exception as _ex:
@@ -205,6 +200,53 @@ class DbMarina:
 			return free_time
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
+	#Функция для проверки свободного времени в зависимости от времени выполнения процедуры
+
+	@staticmethod
+	def check_available_slots(procedure, date):
+		table_name = date
+		start_time = datetime.strptime("10:00", "%H:%M")
+		end_time = datetime.strptime("21:30", "%H:%M")
+		current_time = start_time
+		free_time = DbMarina.screan_schedule(table_name)
+		result = {}
+		try:
+			if procedure in sl.list_procedure_time_30min:
+				result = free_time
+			elif procedure in sl.list_procedure_time_60min:
+				while current_time <= end_time:	
+					for i in range(23):
+						if free_time[sl.times[i]]+free_time[sl.times[i+1]] == 0:
+							result[sl.times[i]] = 0
+							current_time += timedelta(minutes=30)
+						else:
+							result[sl.times[i]] = 1
+							current_time += timedelta(minutes=30)
+				
+			elif procedure in sl.list_procedure_time_90min:
+				while current_time <= end_time:
+					for i in range(22):
+						if free_time[sl.times[i]] + free_time[sl.times[i+1]] + free_time[sl.times[i+2]] == 0:
+							result[sl.times[i]] = 0
+							current_time += timedelta(minutes=30)
+						else:
+							result[sl.times[i]] = 1
+							current_time += timedelta(minutes=30)
+			elif procedure in sl.list_procedure_time_120min:
+				while current_time <= end_time:
+					for i in range(21):
+						if free_time[sl.times[i]] + free_time[sl.times[i+1]] + free_time[sl.times[i+2]] + free_time[sl.times[i+3]] == 0:
+							result[sl.times[i]] = 0
+							current_time += timedelta(minutes=30)
+						else:
+							result[sl.times[i]] = 1
+							current_time += timedelta(minutes=30)
+			return result
+		
+		except Exception as _ex:
+			print(f'[INFO] :', _ex)
+					
+		 
 
 	#Функция проверяет существует ли запись в БД		
 	@staticmethod
@@ -236,21 +278,49 @@ class DbMarina:
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
 			return None
+		
+
+
+	#Функция проверяет Зарегистрирован ли пользователь, прежде чем записаться		
+	@staticmethod
+	def search_registr(client_id):
+		
+		flag = False
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql2 = 'SELECT * FROM clients WHERE client_tg_id = %s'
+				cursor.execute(sql2, (str(client_id),))
+				result = cursor.fetchall()
+				if len(result) > 0:
+					flag = True
+			return flag
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при выполнении удаления неверно внесенных данных:', _ex)	
+
+
+#____________________________________________________________________#
+
+
+	
 #_______________________________________________________________________#
 	
 
 
+#x = DbMarina()
+
+#x.search_registr('6791852890')
 
 
-x = DbMarina()
-#x.create_daily_table()
-#x.complection_new_table()
+#x.check_available_slots('Рекавери+Детокс+Стрижка', '05_03')
+#x.generate_time_slots()
+
 #t = str(307582652)
 #x.delete_incorrect_data(t)
-#print(x.screan_schedule('04_03'))
-#x = DbMarina()
+#print(x.screan_schedule('05_03'))
+
 #print(x.search_for_an_existing('870857305'))
-print(x.check_user_bd('30758265'))
+#print(x.check_user_bd('30758265'))
 
 
 # Запрос создания таблицы clients

@@ -34,10 +34,10 @@ data_choice = InlineKeyboardMarkup(inline_keyboard=[
 	]
 	])
 
-def create_time_keyboard(free_time):
+def create_time_keyboard(result):
 	builder = InlineKeyboardBuilder()
 	item = 0
-	for time, is_broked in free_time.items():
+	for time, is_broked in result.items():
 		item += 1
 		if not is_broked:
 			builder.add(InlineKeyboardButton(text=time, callback_data= f'item{item}'))
