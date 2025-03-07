@@ -13,7 +13,7 @@ import app.dateandtimes as date
 
 
 first_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Важно'), KeyboardButton(text='Цены')],
-										[KeyboardButton(text='Расписание'),KeyboardButton(text='Регистрация')]], 
+										[KeyboardButton(text='Запись'),KeyboardButton(text='Регистрация')]], 
 resize_keyboard=True, input_field_placeholder='Выберите пункт в меню') #, selective=True)
 
 
@@ -108,6 +108,17 @@ selecting_a_procedure = InlineKeyboardMarkup(inline_keyboard=[
 	[InlineKeyboardButton(text='Корни+Длина(Пермамент)+Стрижка', callback_data='W11')]
 ])
 
+admin_first = ReplyKeyboardMarkup(keyboard=[
+	[KeyboardButton(text='Расписание'), KeyboardButton(text='Черный список')]
+], resize_keyboard=True)
+admin_schedule = ReplyKeyboardMarkup(keyboard=[
+	[KeyboardButton(text='Посмотреть расписание'), KeyboardButton(text='Удалить запись')],
+	[KeyboardButton(text='Остановить запись'), KeyboardButton(text='Возобновить запись')],
+	[KeyboardButton(text = 'Назад')]
+], resize_keyboard=True)
+admin_blacklist = ReplyKeyboardMarkup(keyboard=[
+	[KeyboardButton(text='Добавить'), KeyboardButton(text='Удалить')]
+], resize_keyboard=True)
 #Пагинация, используется для перебора каких нибудь сисков и тп. Удобно для меню товаров
 # class Pagination(CallbackData, prefix ='pag'):
 # 	action: str

@@ -12,7 +12,7 @@ def get_connection():
 	connection = psycopg.connect(
 		host = '127.0.0.1',
 		user = 'postgres',
-		password = 'desam248533',
+		password = '248533',
 		dbname='schedule')
 	connection.autocommit = True
 	return connection
@@ -26,11 +26,12 @@ class DbMarina:
 	#Функция для записи регистрирующихся клиентов в Базу данных
 	@staticmethod
 	def db_user_add(client_name, client_surname, client_tg_id, client_number_phone):
+		client_ban = 0
 		try:
 			connection = get_connection()
 			with connection.cursor() as cursor:
-				sql = 'INSERT INTO clients(client_name, client_surname, client_tg_id, client_number_phone) VALUES (%s, %s, %s, %s)'
-				cursor.execute(sql, (client_name, client_surname, client_tg_id, client_number_phone))
+				sql = 'INSERT INTO clients(client_name, client_surname, client_tg_id, client_number_phone, client_ban) VALUES (%s, %s, %s, %s, %s)'
+				cursor.execute(sql, (client_name, client_surname, client_tg_id, client_number_phone, client_ban))
 				print("Запись выплнена")
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
@@ -55,7 +56,7 @@ class DbMarina:
 			if result == {}:
 				result = None
 		except Exception as _ex:
-			print(f'[INFO] Ошибка при выполнении регистрации:', _ex)
+			print(f'[INFO] Ошибка при выполнении проверки регистрации регистрации:', _ex)
 		return result
 	
 	#Функция для создания новой таблици для записи клиентов
@@ -123,7 +124,7 @@ class DbMarina:
 
 	#Создание таблици необходимой для регистрации клиентов
 	@staticmethod
-	def clietns():
+	def clients():
 		try:
 			connection = get_connection()
 			with connection.cursor() as cursor:
@@ -133,7 +134,8 @@ class DbMarina:
 								client_name varchar(20),
 								client_surname varchar(20),
 								client_tg_id varchar(50),
-								client_number_phone varchar(20)							
+								client_number_phone varchar(20),
+								client_ban integer							
 								)'''
 				cursor.execute(sql1)
 				logging.info(f'Таблица tab_ успешно создана')
@@ -298,8 +300,34 @@ class DbMarina:
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении удаления неверно внесенных данных:', _ex)	
 
+	@staticmethod
+	def access_verification(id):
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql = 'Select client_ban from clients where client_tg_id = %s'
+				cursor.execute(sql, (str(id),))
+				result = cursor.fetchall()
+				return result[0][0]
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при проведении проверки наличия ограничений к записи', _ex)
+	
 
 #____________________________________________________________________#
+
+	"""Здесь прописанно меню админа и его функции"""
+	@staticmethod
+	def rights_verification(id):
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				sql = 'Select client_tg_id from clients where client_tg_id = %s'
+				cursor.execute(sql, (str(id),))
+				result = cursor.fetchall()
+			return result[0][0]
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при проведении проверки наличия ограничений к записи', _ex)
+
 
 
 	
@@ -308,7 +336,9 @@ class DbMarina:
 
 
 #x = DbMarina()
+#x.rights_verification(307582652)
 
+# x.search_registr('6791852890')
 #x.search_registr('6791852890')
 
 

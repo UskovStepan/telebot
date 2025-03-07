@@ -1,36 +1,36 @@
-import psycopg
-from datetime import datetime, timedelta
-import schedule
-import time
-import app.dateandtimes as day
-import logging
-import app.slovo as sl
+# import psycopg
+# from datetime import datetime, timedelta
+# import schedule
+# import time
+# import app.dateandtimes as day
+# import logging
+# import app.slovo as sl
 
 
-def get_connection():
-	connection = psycopg.connect(
-		host = '127.0.0.1',
-		user = 'postgres',
-		password = 'desam248533',
-		dbname='schedule')
-	connection.autocommit = True
-	return connection
+# def get_connection():
+# 	connection = psycopg.connect(
+# 		host = '127.0.0.1',
+# 		user = 'postgres',
+# 		password = '248533',
+# 		dbname='schedule')
+# 	connection.autocommit = True
+# 	return connection
 
 
 
                    
            
 
-class DbMarina:
-	"""
-	Содержит основные функции взаиможействия с БД
-	"""
-	now = day.now
+# class DbMarina:
+# 	"""
+# 	Содержит основные функции взаиможействия с БД
+# 	"""
+# 	now = day.now
 
 
 # 	@staticmethod
 # 	def create_daily_table():
-# 		table_name = day.third_day.strftime("%d_%m")
+# 		table_name = day.six_day.strftime("%d_%m")
 # 		try:
 # 			connection = get_connection()
 # 			with connection.cursor() as cursor:
@@ -51,7 +51,7 @@ class DbMarina:
 # 		start_time = datetime.strptime("10:00", "%H:%M")
 # 		end_time = datetime.strptime("21:30", "%H:%M")
 # 		current_time = start_time
-# 		table_name = day.third_day.strftime("%d_%m")
+# 		table_name = day.six_day.strftime("%d_%m")
 # 		num_empty = 0
 # 		try:
 # 			connection = get_connection()
@@ -64,7 +64,29 @@ class DbMarina:
 # 		except Exception as create_e:
 # 				print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
+
+# 	@staticmethod
+# 	def clients():
+# 		try:
+# 			connection = get_connection()
+# 			with connection.cursor() as cursor:
+# 				sql1 = f'''CREATE TABLE IF NOT EXISTS clients
+# 								(
+# 								client_id serial,
+# 								client_name varchar(20),
+# 								client_surname varchar(20),
+# 								client_tg_id varchar(50),
+# 								client_number_phone varchar(20),
+# 								client_ban integer							
+# 								)'''
+# 				cursor.execute(sql1)
+# 				logging.info(f'Таблица tab_ успешно создана')
+# 		except Exception as create_e:
+# 			print(f'Ошибка при создании или заполнении таблицы: {create_e}')
+
+
 # x = DbMarina()
+# x.clients()
 # x.create_daily_table()
 # x.complection_new_table()
 

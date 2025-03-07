@@ -13,13 +13,19 @@ import database as db
 router = Router()
 
 marina = '@Smarnie'
+admin_id = 307582652
 
 
 """Обработчик команды старт"""
 @router.message(CommandStart())
 async def cmd_start(message: Message):
+    admin_id = '307582652'
+    id = message.from_user.id
     surname = message.from_user.last_name if message.from_user.last_name else ' '
-    await message.answer(f'Привет {message.from_user.first_name} {surname}! Я помогу тебе записаться к {marina}, расскажу тебе о ценах на услуги и напомню о записи за час! Пожалуйста не забудьте пройти регистрацию!', reply_markup=kb.first_kb)
+    if admin_id == db.DbMarina.rights_verification(id):
+        await message.answer(f'Здравствуй госпожа!\nХорошего Вам дня', reply_markup=kb.admin_first)
+    else:
+        await message.answer(f'Привет {message.from_user.first_name} {surname}! Я помогу тебе записаться к {marina}, расскажу тебе о ценах на услуги и напомню о записи за час! Пожалуйста не забудьте пройти регистрацию!', reply_markup=kb.first_kb)
      
 """Обработка регистрации ползователя"""
 class Registration(StatesGroup):
@@ -94,18 +100,22 @@ class Registration_data(StatesGroup):
     procedure = State()
 
 
-@router.message(F.text == 'Расписание')
+@router.message(F.text == 'Запись')
 async def schedule(message: Message, state: FSMContext):
     id = message.from_user.id
     result = db.DbMarina.search_for_an_existing(id)
-    if db.DbMarina.search_registr(id) == False:
-        await message.answer(f'Вы забыли зарегистрироваться, запись доступка только после регистрации')
+    banned = db.DbMarina.access_verification(id)
+    if banned == 1:
+        await message.answer(f'Ой, а вы в черном списке! Я уверен что это просто ошибка но, свяжитесь с {marina} и уточните в чем причина и как исправить данную ситуацию!')
     else:
-        if result is not None:
-            await message.answer(f'Вы записаны на: {result["date_rec"]}\nВремя записи: {result["recorder_time"]}\nНа процедуру: {result["procedure"]}')
+        if db.DbMarina.search_registr(id) == False:
+            await message.answer(f'Вы забыли зарегистрироваться, запись доступка только после регистрации')
         else:
-            await message.answer(f'ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ ЗАПИСЬ ОБЯЗАТЕЛЬНО ПЕРЕЗАГРУЖАЙТЕ БОТА ДЛЯ АКТУАЛИЗАЦИИ ИНФОРМАЦИИ!!!\n{message.from_user.first_name}, выберите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
-            await state.set_state(Registration_data.procedure)
+            if result is not None:
+                await message.answer(f'Вы записаны на: {result["date_rec"]}\nВремя записи: {result["recorder_time"]}\nНа процедуру: {result["procedure"]}')
+            else:
+                await message.answer(f'ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ ЗАПИСЬ ОБЯЗАТЕЛЬНО ПЕРЕЗАГРУЖАЙТЕ БОТА ДЛЯ АКТУАЛИЗАЦИИ ИНФОРМАЦИИ!!!\n{message.from_user.first_name}, выберите на какую процедуру вы бы хотели записаться!', reply_markup=kb.selecting_a_procedure)
+                await state.set_state(Registration_data.procedure)
 
 
 @router.callback_query(Registration_data.procedure)
@@ -145,3 +155,10 @@ async def catalog_day_four(callback:CallbackQuery):
 async def step_back(callback: CallbackQuery):
     await callback.answer(f'Назад')
     await callback.message.edit_text(f'{callback.from_user.first_name} выбери дату!', reply_markup=kb.data_choice)
+
+
+#___________________________________________________________________#
+'''Обработка действий админа'''
+@router.message(F.text =='Расписание')
+async def catalog_day_four(message:Message): 
+    await message.answer(f' Выбурите какие виды процедур Вам нужны!', reply_markup=kb.admin_schedule)

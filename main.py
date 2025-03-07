@@ -1,21 +1,23 @@
+import os
 import asyncio
 import logging
-# import database as db
+
 
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 from app.hendlers import router
-
+#from dotenv import load_dotenv
 # import schedule
 # import time
 
 
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
 
 
 async def main():
+	#load_dotenv()
+	bot = Bot(token=TOKEN)
+	dp = Dispatcher()
 	dp.include_router(router)
 	await dp.start_polling(bot)
       
