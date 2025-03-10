@@ -1,4 +1,5 @@
 import psycopg
+from psycopg import sql
 from datetime import datetime, timedelta
 import schedule
 import time
@@ -143,7 +144,6 @@ class DbMarina:
 			print(f'Ошибка при создании или заполнении таблицы: {create_e}')
 
 
-
 	#Функция для записи клиентов на определенное время
 	@staticmethod
 	def db_schedule_add(recorder_time, procedure, client_id, date, record = 1):
@@ -202,8 +202,9 @@ class DbMarina:
 			return free_time
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
-	#Функция для проверки свободного времени в зависимости от времени выполнения процедуры
 
+
+	#Функция для проверки свободного времени в зависимости от времени выполнения процедуры
 	@staticmethod
 	def check_available_slots(procedure, date):
 		table_name = date
@@ -243,17 +244,16 @@ class DbMarina:
 						else:
 							result[sl.times[i]] = 1
 							current_time += timedelta(minutes=30)
+			
 			return result
 		
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
 					
 		 
-
 	#Функция проверяет существует ли запись в БД		
 	@staticmethod
 	def search_for_an_existing(client_id):
-		#client_id = str(client_id)
 		print(client_id)
 		try:
 			connection = get_connection()
@@ -274,14 +274,11 @@ class DbMarina:
 						current_data += timedelta(days=1)
 			if res == {}:
 				res = None		
-					#res = [day.now.strftime("%d_%m"), formatted_result[0], result1[0]]
-					#if cursor.fetchone() is not 'Null':
 			return res
 		except Exception as _ex:
 			print(f'[INFO] :', _ex)
 			return None
 		
-
 
 	#Функция проверяет Зарегистрирован ли пользователь, прежде чем записаться		
 	@staticmethod
@@ -300,6 +297,7 @@ class DbMarina:
 		except Exception as _ex:
 			print(f'[INFO] Ошибка при выполнении удаления неверно внесенных данных:', _ex)	
 
+	#Функция проверяет забанен ли пользователь, прежде чем записаться
 	@staticmethod
 	def access_verification(id):
 		try:
@@ -316,6 +314,7 @@ class DbMarina:
 #____________________________________________________________________#
 
 	"""Здесь прописанно меню админа и его функции"""
+	#Проверка на id админа
 	@staticmethod
 	def rights_verification(id):
 		try:
@@ -329,20 +328,53 @@ class DbMarina:
 			print(f'[INFO] Ошибка при проведении проверки наличия ограничений к записи', _ex)
 
 
+	#Предоставляет спсок записи на конкретный день
+	@staticmethod
+	def chek_schedule(date):
+		table_name = date
+		procedure_name = []
+		try:
+			connection = get_connection()
+			with connection.cursor() as cursor:
+				query = sql.SQL("SELECT recorder_time, procedure, client_id from tab_{}").format(
+                sql.Identifier(table_name)
+            )
+				cursor.execute(query)
+				result = cursor.fetchall()
 
+				# Форматируем результат
+				schedule = {}
+				for row in result:
+					time_slot = row[0]
+					procedure = row[1]
+					client_id = row[2]
+					if client_id:
+						schedule[time_slot] = f"Занято: {procedure} (Client ID: {client_id})"
+					else:
+						schedule[time_slot] = "Свободно"
+
+				# Выводим результат
+				for time_slot, status in sorted(schedule.items()):
+					print(f"{time_slot}: {status}")
+
+
+		except Exception as _ex:
+			print(f'[INFO] Ошибка при проведении проверки наличия ограничений к записи:', _ex)
+    	
 	
 #_______________________________________________________________________#
 	
+x = DbMarina()
+#x.chek_schedule('14_03')
+x.screan_schedule('14_03')
 
-
-#x = DbMarina()
 #x.rights_verification(307582652)
 
 # x.search_registr('6791852890')
 #x.search_registr('6791852890')
 
 
-#x.check_available_slots('Рекавери+Детокс+Стрижка', '05_03')
+x.check_available_slots('Рекавери+Детокс+Стрижка', '14_03')
 #x.generate_time_slots()
 
 #t = str(307582652)

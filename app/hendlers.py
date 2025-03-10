@@ -19,7 +19,7 @@ admin_id = 307582652
 """Обработчик команды старт"""
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    admin_id = '307582652'
+    admin_id = '307582652#'
     id = message.from_user.id
     surname = message.from_user.last_name if message.from_user.last_name else ' '
     if admin_id == db.DbMarina.rights_verification(id):
@@ -161,4 +161,20 @@ async def step_back(callback: CallbackQuery):
 '''Обработка действий админа'''
 @router.message(F.text =='Расписание')
 async def catalog_day_four(message:Message): 
-    await message.answer(f' Выбурите какие виды процедур Вам нужны!', reply_markup=kb.admin_schedule)
+    await message.answer(f'Не знаю что здесь написать!', reply_markup=kb.admin_schedule)
+
+@router.message(F.text =='Посмотреть расписание')
+async def catalog_day_four(message:Message): 
+    await message.edit_text(f'Выбери день', reply_markup=kb.admin_data_choice)
+
+@router.callback_query(F.data == 'abutton1')
+
+@router.message(F.text =='Удалить запись')
+async def catalog_day_four(message:Message): 
+    await message.edit_text(f'Выбери день', reply_markup=kb.admin_data_choice)    
+
+
+
+@router.message(F.text =='Черный список')
+async def catalog_day_four(message:Message): 
+    await message.answer(f'', reply_markup=kb.admin_blacklist)

@@ -7,7 +7,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import worknow as wr
 
 #from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-#from aiogram.filters.callback_data import CallbackData
+from aiogram.filters.callback_data import CallbackData
 import app.dateandtimes as date
 #first_day, sixth_day, seventh_day 
 
@@ -103,32 +103,33 @@ selecting_a_procedure = InlineKeyboardMarkup(inline_keyboard=[
 	[InlineKeyboardButton(text='Уход "Детокс"+Стрижка', callback_data='W6')],
 	[InlineKeyboardButton(text='Уход "Пломбир"+Стрижка', callback_data='W7')],
 	[InlineKeyboardButton(text='Рекавери+Детокс+Стрижка', callback_data='W8')],
-	[InlineKeyboardButton(text='Пломбир+Детокс+Стрижка', callback_data='W9')],
-	[InlineKeyboardButton(text='Корни+Тонирование+Стрижка', callback_data='W10')],
-	[InlineKeyboardButton(text='Корни+Длина(Пермамент)+Стрижка', callback_data='W11')]
+	[InlineKeyboardButton(text='Пломбир+Детокс+Стрижка', callback_data='W9')]
 ])
 
 admin_first = ReplyKeyboardMarkup(keyboard=[
 	[KeyboardButton(text='Расписание'), KeyboardButton(text='Черный список')]
 ], resize_keyboard=True)
+
+
 admin_schedule = ReplyKeyboardMarkup(keyboard=[
 	[KeyboardButton(text='Посмотреть расписание'), KeyboardButton(text='Удалить запись')],
 	[KeyboardButton(text='Остановить запись'), KeyboardButton(text='Возобновить запись')],
-	[KeyboardButton(text = 'Назад')]
+	[KeyboardButton(text='Изменить запись'), KeyboardButton(text = 'Назад')]
 ], resize_keyboard=True)
+
 admin_blacklist = ReplyKeyboardMarkup(keyboard=[
 	[KeyboardButton(text='Добавить'), KeyboardButton(text='Удалить')]
 ], resize_keyboard=True)
-#Пагинация, используется для перебора каких нибудь сисков и тп. Удобно для меню товаров
-# class Pagination(CallbackData, prefix ='pag'):
-# 	action: str
-# 	page: int
 
-# def paginator(page: int = 0):
-# 	builder = InlineKeyboardBuilder()
-# 	builder.row(
-# 		InlineKeyboardButton(text='Назад', callback_data=Pagination(action="prev", page=page).pack()),
-# 		InlineKeyboardButton(text='Вперед', callback_data=Pagination(action="next", page=page).pack()),
-# 		width=2
-# 	)
-# 	return builder.as_markup()
+class MyCallbackFactory(CallbackData, prefix = 'my_factory'):
+	action: str
+	item_id: int
+
+admin_data_choice = InlineKeyboardMarkup(inline_keyboard=[
+	[InlineKeyboardButton(text=f'{date.now.strftime("%d %b")}', callback_data='abutton1')],
+	[InlineKeyboardButton(text=f'{date.second_day.strftime("%d %b")}', callback_data='abutton2'), 
+	InlineKeyboardButton(text=f'{date.third_day.strftime("%d %b")}', callback_data='abutton3')], 		
+	[InlineKeyboardButton(text=f'{date.fourth_day.strftime("%d %b")}', callback_data='abutton4'), 
+	InlineKeyboardButton(text=f'{date.fifth_day.strftime("%d %b")}', callback_data=MyCallbackFactory(action = 'answer', item_id=5 ).pack())],
+	[InlineKeyboardButton(text='Назад', callback_data='a_button6')]
+	])

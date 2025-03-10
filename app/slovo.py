@@ -15,9 +15,7 @@ procedure_name = {'M1': 'Мужская стрижка',
 			'W6': 'Уход "Детокс"+Стрижка',
 			'W7': 'Уход "Пломбир"+Стрижка',
 			'W8': 'Рекавери+Детокс+Стрижка',
-			'W9': 'Пломбир+Детокс+Стрижка',
-			'W10': 'Корни+Тонирование+Стрижка',
-			'W11': 'Корни+Длина(Пермамент)+Стрижка'}
+			'W9': 'Пломбир+Детокс+Стрижка'}
     
 data_name = {
     'button1': f'{date.second_day.strftime("%d_%m")}',
@@ -33,28 +31,12 @@ times = ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
 item_name = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 
 'item7', 'item8', 'item9', 'item10', 'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18', 'item19', 'item20', 'item21', 'item22', 'item23', 'item24']
 
+admin_screan = {'10:00': [], '10:30': [], '11:00': [], '11:30': [], '12:00': [], '12:30': [], '13:00': [], '13:30': [], '14:00': [], '14:30': [], '15:00': [], '15:30': [], '16:00': [], '16:30': [], '17:00': [], '17:30': [], '18:00': [], '18:30': [], '19:00': [], '19:30': [], '20:00': []}
+
+
+
 list_procedure_time_30min = ['Челка', 'Ровный срез с мытьем головы']
 list_procedure_time_60min = ['Мужская стрижка', 'Ровный срез без мытьем головы', 'Мытье головы+выпрямление']
 list_procedure_time_90min = ['Уход "Пломбир"+Стрижка','Мужская+детокс кожи головы', 'Тонирование седены+Мужская стрижка', 'Уход "Рекавери"+Стрижка', 'Уход "Детокс"+Стрижка']
 list_procedure_time_120min = ['Рекавери+Детокс+Стрижка', 'Пломбир+Детокс+Стрижка']
 			
-# def lol(current_time, end_time):
-# 	total = 1
-# 	result = {}
-# 	current_time = start_time
-# 	while current_time <= end_time:
-# 		result[f"item{total}"] = current_time.strftime("%H:%M")
-# 		total += 1
-# 		current_time += timedelta(minutes=30)
-# 	return result
-
-# start_time = datetime.strptime("10:00", "%H:%M")
-# end_time = datetime.strptime("21:30", "%H:%M")
-# current_time = start_time
-
-# result_dict = lol(start_time, end_time)
-# time_name = result_dict
-
-# print(type(data_name['button2']))
-# print(type(time_name['item1']))
-# print(type(procedure_name['M3']))
