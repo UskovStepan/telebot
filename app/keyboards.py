@@ -4,12 +4,11 @@ from aiogram.types import (
 	InlineKeyboardMarkup,
 	InlineKeyboardButton)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-import worknow as wr
+from datetime import datetime, timedelta
 
-#from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 import app.dateandtimes as date
-#first_day, sixth_day, seventh_day 
+
 
 
 first_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Важно'), KeyboardButton(text='Цены')],
@@ -122,14 +121,29 @@ admin_blacklist = ReplyKeyboardMarkup(keyboard=[
 ], resize_keyboard=True)
 
 class MyCallbackFactory(CallbackData, prefix = 'my_factory'):
-	action: str
-	item_id: int
+	number: int
 
 admin_data_choice = InlineKeyboardMarkup(inline_keyboard=[
-	[InlineKeyboardButton(text=f'{date.now.strftime("%d %b")}', callback_data='abutton1')],
-	[InlineKeyboardButton(text=f'{date.second_day.strftime("%d %b")}', callback_data='abutton2'), 
-	InlineKeyboardButton(text=f'{date.third_day.strftime("%d %b")}', callback_data='abutton3')], 		
-	[InlineKeyboardButton(text=f'{date.fourth_day.strftime("%d %b")}', callback_data='abutton4'), 
-	InlineKeyboardButton(text=f'{date.fifth_day.strftime("%d %b")}', callback_data=MyCallbackFactory(action = 'answer', item_id=5 ).pack())],
-	[InlineKeyboardButton(text='Назад', callback_data='a_button6')]
+	[
+		InlineKeyboardButton(text=f'{date.now.strftime("%d %b")}', callback_data='abutton1'),
+		InlineKeyboardButton(text=f'{date.second_day.strftime("%d %b")}', callback_data='abutton2')
+	], 
+	[
+		InlineKeyboardButton(text=f'{date.third_day.strftime("%d %b")}', callback_data='abutton3'), 	InlineKeyboardButton(text=f'{date.fourth_day.strftime("%d %b")}', callback_data='abutton4')
+	], 
+	[
+		InlineKeyboardButton(text=f'{date.fifth_day.strftime("%d %b")}', callback_data='abutton4'),InlineKeyboardButton(text='Назад', callback_data='a_button6')
+	]
 	])
+
+
+def build_actions_kb():
+	builder = InlineKeyboardBuilder()
+	time = date.now
+	for i in range(5):
+		time_in = time.strftime("%d %b")
+		builder.add(InlineKeyboardButton(text=time_in, callback_data= f'a_item{i}'))
+		time += timedelta(days=1)
+	builder.add(InlineKeyboardButton(text='Назад', callback_data='a_back'))
+	builder.adjust(2)
+	return builder.as_markup()

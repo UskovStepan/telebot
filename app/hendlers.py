@@ -5,6 +5,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 
+
 import app.keyboards as kb
 import app.slovo as sl
 import database as db
@@ -19,7 +20,7 @@ admin_id = 307582652
 """Обработчик команды старт"""
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    admin_id = '307582652#'
+    admin_id = '307582652'
     id = message.from_user.id
     surname = message.from_user.last_name if message.from_user.last_name else ' '
     if admin_id == db.DbMarina.rights_verification(id):
@@ -165,13 +166,15 @@ async def catalog_day_four(message:Message):
 
 @router.message(F.text =='Посмотреть расписание')
 async def catalog_day_four(message:Message): 
-    await message.edit_text(f'Выбери день', reply_markup=kb.admin_data_choice)
+    await message.answer(f'Выбери день', reply_markup=kb.build_actions_kb())
 
-@router.callback_query(F.data == 'abutton1')
+@router.callback_query(kb.action_cd.filter(action = 'item'))
+async def process_item(callback: CallbackQuery, callback_data: dict):
+    callback
 
 @router.message(F.text =='Удалить запись')
 async def catalog_day_four(message:Message): 
-    await message.edit_text(f'Выбери день', reply_markup=kb.admin_data_choice)    
+    await message.answer(f'Выбери день', reply_markup=kb.admin_data_choice)    
 
 
 
